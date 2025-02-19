@@ -6,10 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="HogWarpSdk">
-      <HintPath>../HogWarpSdk.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>
