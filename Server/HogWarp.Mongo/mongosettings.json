@@ -1,0 +1,5 @@
+﻿{
+  "Database": "hogwarp",
+  "Host": "localhost",
+  "Port": 27017
+}
