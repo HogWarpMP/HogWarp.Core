@@ -3,7 +3,7 @@ using HogWarpSdk.Game;
 using HogWarpSdk.Systems;
 using System.Numerics;
 
-namespace HogWarpChat
+namespace HogWarp.Chat
 {
     public class Plugin : HogWarpSdk.IPlugin
     {
@@ -141,7 +141,7 @@ namespace HogWarp.Replicated
 {
     public partial class BP_HogWarpChat
     {
-        internal HogWarpChat.Plugin? Plugin { get; set; }
+        internal Chat.Plugin? Plugin { get; set; }
         public partial void SendMsg(Player player, string Message)
         {
             Plugin!.ReceiveMessage(player, Message);
