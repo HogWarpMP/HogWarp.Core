@@ -51,7 +51,7 @@ namespace HogWarp.Weather
 
         private void Timer_Elapsed(float delta)
         {
-            currentTime.AddMinutes(1);
+            currentTime = currentTime.AddMinutes(1);
             SendTimeUpdate();
             if (weatherActor != null)
             {
