@@ -1,6 +1,6 @@
 namespace HogWarp.Game
 {
-    public interface IPlayer
+    public interface Player
     {
         public void Kick();
 
