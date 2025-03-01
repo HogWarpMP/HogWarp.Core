@@ -10,9 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="HogWarpSdk">
-      <HintPath>../../../../HogWarpSdk.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Serilog" Version="4.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HogWarp.Game\HogWarp.Game.csproj" />
   </ItemGroup>
 
 </Project>

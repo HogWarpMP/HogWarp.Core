@@ -1,10 +1,12 @@
-﻿using HogWarp.Replicated;
-using HogWarpSdk.Game;
-using HogWarpSdk.Systems;
+﻿using HogWarp.Game;
+using HogWarp.Game.System;
+using HogWarp.Game.World;
+using HogWarp.Replicated;
+using Serilog;
 
 namespace HogWarp.Weather
 {
-    public class Plugin : HogWarpSdk.IPlugin
+    public class Plugin : IPlugin
     {
         public string Author => "HogWarp Team";
         public string Name => "HogWarpWeather";
@@ -21,7 +23,7 @@ namespace HogWarp.Weather
         private eSeasons _currentESeason = eSeasons.Fall;
         private string currentWeather = "StormyLarge_01";
         private DateTime currentTime = new DateTime(1980, 1, 1, 6, 0, 0);
-        private Logger log = new HogWarpSdk.Systems.Logger("HogWarpWeather");
+        private ILogger Logger = Log.Logger.ForContext<Plugin>();
         private BP_HogWarpWeather? weatherActor;
 
         public Plugin()
@@ -40,13 +42,13 @@ namespace HogWarp.Weather
 
         public void PostLoad() 
         {
-            weatherActor = HogWarpSdk.Server.World.Spawn<BP_HogWarpWeather>()!;
+            weatherActor = Server.Level.Spawn<BP_HogWarpWeather>()!;
             weatherActor.Plugin = this;
-            
-            HogWarpSdk.Server.PlayerSystem.PlayerJoinEvent += PlayerSystem_PlayerJoinEvent;
-            HogWarpSdk.Server.Timer.Add(Timer_Elapsed, 60.0f);
 
-            log.Info($"The time is {currentTime.TimeOfDay.ToString()}, the weather is: {currentWeather}, and the season: {_currentESeason.ToString()}");
+            Server.Level.Players.PlayerJoinEvent += PlayerSystem_PlayerJoinEvent;
+            Server.Timer.Add(Timer_Elapsed, 60.0f);
+
+            Logger.Information($"The time is {currentTime.TimeOfDay.ToString()}, the weather is: {currentWeather}, and the season: {_currentESeason.ToString()}");
         }
 
         private void Timer_Elapsed(float delta)
@@ -55,7 +57,7 @@ namespace HogWarp.Weather
             SendTimeUpdate();
             if (weatherActor != null)
             {
-                var syncPlayer = HogWarpSdk.Server.PlayerSystem.Players.FirstOrDefault();
+                var syncPlayer = Server.Level.Players.FirstOrDefault();
                 if(syncPlayer != null)
                 {
                     weatherActor.RequestWeather(syncPlayer);
@@ -76,7 +78,7 @@ namespace HogWarp.Weather
 
                 if (weatherActor != null)
                 {
-                    foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+                    foreach (var p in Server.Level.Players)
                     {
                         weatherActor.UpdateWeather(p, currentWeather);
                     }
@@ -92,7 +94,7 @@ namespace HogWarp.Weather
 
                 if (weatherActor != null)
                 {
-                    foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+                    foreach (var p in Server.Level.Players)
                     {
                         weatherActor.UpdateSeason(p, (int)_currentESeason);
                     }
@@ -110,7 +112,7 @@ namespace HogWarp.Weather
 
                 if (weatherActor != null)
                 {
-                    foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+                    foreach (var p in Server.Level.Players)
                     {
                         weatherActor.UpdateTime(p, currentTime.Hour, currentTime.Minute, currentTime.Second);
                     }
@@ -122,7 +124,7 @@ namespace HogWarp.Weather
         {
             if (weatherActor != null)
             {
-                foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+                foreach (var p in Server.Level.Players)
                 {
                     weatherActor.UpdateTime(p, currentTime.Hour, currentTime.Minute, currentTime.Second);
                 }
@@ -136,17 +138,17 @@ namespace HogWarp.Replicated
     public partial class BP_HogWarpWeather
     {
         internal Weather.Plugin? Plugin { get; set; }
-        public partial void SendWeather(HogWarpSdk.Game.Player player, string Weather)
+        public partial void SendWeather(Player player, string Weather)
         {
             Plugin!.SetWeather(Weather);
         }
 
-        public partial void SendSeason(HogWarpSdk.Game.Player player, int Season)
+        public partial void SendSeason(Player player, int Season)
         {
             Plugin!.SetSeason(Season);
         }
 
-        public partial void SendTime(HogWarpSdk.Game.Player player, int Hour, int Minute, int Second)
+        public partial void SendTime(Player player, int Hour, int Minute, int Second)
         {
             Plugin!.SetTime(Hour, Minute, Second);
         }

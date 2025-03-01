@@ -3,10 +3,8 @@
 #pragma warning disable CS8618
 #pragma warning disable CS0219
 
-using HogWarpSdk;
-using HogWarpSdk.Game;
-using HogWarpSdk.Systems;
-using HogWarpSdk.Internal;
+using HogWarp.Game.System;
+using HogWarp.Game.World;
 
 namespace HogWarp.Replicated
 {
@@ -17,15 +15,15 @@ namespace HogWarp.Replicated
         public void RequestWeather(Player player)
         {
             ushort length = 0;
-            var data = IBuffer.Create();
+            var data = Game.Server.RpcManager.Create();
             try
             {
-                
-                IRpc.Get().Call(player.InternalPlayer, Id, 15532929627310947727, 878023123782860370, data);
+
+                Game.Server.RpcManager.Call(player.Id, Id, 15532929627310947727, 878023123782860370, data);
             }
             finally
             {
-                IBuffer.Release(data);
+                Game.Server.RpcManager.Release(data);
             }
         }
         public partial void SendWeather(Player player, string Weather);
@@ -67,50 +65,50 @@ namespace HogWarp.Replicated
         public void UpdateSeason(Player player, int NewSeason)
         {
             ushort length = 0;
-            var data = IBuffer.Create();
+            var data = Game.Server.RpcManager.Create();
             try
             {
                 data.WriteInt32(NewSeason);
-                
-                IRpc.Get().Call(player.InternalPlayer, Id, 15532929627310947727, 14789952481435040489, data);
+
+                Game.Server.RpcManager.Call(player.Id, Id, 15532929627310947727, 14789952481435040489, data);
             }
             finally
             {
-                IBuffer.Release(data);
+                Game.Server.RpcManager.Release(data);
             }
         }
         [ClientRpc(Function = "UpdateTime", Hash = 14849233365027045749)]
         public void UpdateTime(Player player, int Hours, int Minutes, int Seconds)
         {
             ushort length = 0;
-            var data = IBuffer.Create();
+            var data = Game.Server.RpcManager.Create();
             try
             {
                 data.WriteInt32(Hours);
                 data.WriteInt32(Minutes);
                 data.WriteInt32(Seconds);
-                
-                IRpc.Get().Call(player.InternalPlayer, Id, 15532929627310947727, 14849233365027045749, data);
+
+                Game.Server.RpcManager.Call(player.Id, Id, 15532929627310947727, 14849233365027045749, data);
             }
             finally
             {
-                IBuffer.Release(data);
+                Game.Server.RpcManager.Release(data);
             }
         }
         [ClientRpc(Function = "UpdateWeather", Hash = 3942421668184961192)]
         public void UpdateWeather(Player player, string Weather)
         {
             ushort length = 0;
-            var data = IBuffer.Create();
+            var data = Game.Server.RpcManager.Create();
             try
             {
                 data.WriteString(Weather);
-                
-                IRpc.Get().Call(player.InternalPlayer, Id, 15532929627310947727, 3942421668184961192, data);
+
+                Game.Server.RpcManager.Call(player.Id, Id, 15532929627310947727, 3942421668184961192, data);
             }
             finally
             {
-                IBuffer.Release(data);
+                Game.Server.RpcManager.Release(data);
             }
         }
     }
