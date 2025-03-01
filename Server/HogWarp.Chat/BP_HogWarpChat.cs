@@ -3,10 +3,8 @@
 #pragma warning disable CS8618
 #pragma warning disable CS0219
 
-using HogWarpSdk;
-using HogWarpSdk.Game;
-using HogWarpSdk.Systems;
-using HogWarpSdk.Internal;
+using HogWarp.Game.System;
+using HogWarp.Game.World;
 
 namespace HogWarp.Replicated
 {
@@ -28,16 +26,16 @@ namespace HogWarp.Replicated
         public void RecieveMsg(Player player, string Message)
         {
             ushort length = 0;
-            var data = IBuffer.Create();
+            var data = Game.Server.RpcManager.Create();
             try
             {
                 data.WriteString(Message);
-                
-                IRpc.Get().Call(player.InternalPlayer, Id, 15185056061269658332, 12684788271436983199, data);
+
+                Game.Server.RpcManager.Call(player.Id, Id, 15185056061269658332, 12684788271436983199, data);
             }
             finally
             {
-                IBuffer.Release(data);
+                Game.Server.RpcManager.Release(data);
             }
         }
     }

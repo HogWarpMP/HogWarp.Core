@@ -1,13 +1,12 @@
-﻿using HogWarp.Replicated;
-using HogWarpSdk.Game;
-using HogWarpSdk.Systems;
-using System.Numerics;
+﻿using HogWarp.Game.World;
+using HogWarp.Replicated;
+using Serilog;
 
 namespace HogWarp.Chat
 {
-    public class Plugin : HogWarpSdk.IPlugin
+    public class Plugin : Game.System.IPlugin
     {
-        private Logger log = new Logger("HogWarpChat");
+        private ILogger Logger = Log.Logger.ForContext<Plugin>(); 
         public event Action<Player, string> OnChatMessage;
         private float sayDist = 400;
         private float shoutDist = 1500;
@@ -15,12 +14,12 @@ namespace HogWarp.Chat
         private BP_HogWarpChat? chatActor;
         public bool chatMsgOverride = false;
         private Dictionary<string, Action<Player, string>> commands = new Dictionary<string, Action<Player, string>>();
+        private Level _level;
 
         public Plugin()
         {
             OnChatMessage += Chat_OnChatMessage;
-
-
+            _level = Game.Server.Level;
         }
 
         public string Author => "HogWarp Team";
@@ -31,7 +30,7 @@ namespace HogWarp.Chat
 
         public void PostLoad()
         {
-            chatActor = HogWarpSdk.Server.World.Spawn<BP_HogWarpChat>()!;
+            chatActor = _level.Spawn<BP_HogWarpChat>()!;
             chatActor.Plugin = this;
 
             commands.Add("/me", SlashMe);
@@ -58,7 +57,7 @@ namespace HogWarp.Chat
         {
             if (!commands.TryAdd(command, action))
             {
-                log.Warn($"{command} command already exists!");
+                Logger.Warning($"{command} command already exists!");
             }
         }
 
@@ -76,7 +75,7 @@ namespace HogWarp.Chat
 
         private void SlashMe(Player player, string msg)
         {
-            foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+            foreach (var p in _level.Players)
             {
                 SendMessage(p, "<Server>" + player.Username + msg.Substring(3) + "</>");
             }
@@ -84,7 +83,7 @@ namespace HogWarp.Chat
 
         private void SlashHouse(Player player, string msg)
         {
-            foreach (var p in HogWarpSdk.Server.PlayerSystem.Players.Where(p => p.House == player.House))
+            foreach (var p in _level.Players.Where(p => p.House == player.House))
             {
                 SendMessage(p, "<img id=\"" + (House)player.House + "\"/><" + (House)player.House + ">" + player.Username + ": " + msg.Substring(7) + "</>");
             }
@@ -100,10 +99,10 @@ namespace HogWarp.Chat
             else if (msg.StartsWith("/shout")) { msgDist = shoutDist; msgSub = 7; msgType = "shouts"; }
             else { msgDist = whisperDist; msgSub = 9; msgType = "whispers"; }
 
-            foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+            foreach (var p in _level.Players)
             {
-                Vector3 plyPos = new Vector3(player.Position.X, player.Position.Y, player.Position.Z);
-                Vector3 pPos = new Vector3(p.Position.X, p.Position.Y, p.Position.Z);
+                var plyPos = player.Position;
+                var pPos = p.Position;
                 var dist = plyPos - pPos;
 
                 if (dist.Length() <= msgDist)
@@ -115,7 +114,7 @@ namespace HogWarp.Chat
 
         private void BuildMessage(Player player, string msg)
         {
-            log.Info(player.Username + ": " + msg);
+            Logger.Information(player.Username + ": " + msg);
 
             if (commands.ContainsKey(msg.Split(" ")[0]))
             {
@@ -123,7 +122,7 @@ namespace HogWarp.Chat
             }
             else
             {
-                foreach (var p in HogWarpSdk.Server.PlayerSystem.Players)
+                foreach (var p in _level.Players)
                 {
                     SendMessage(p, "<img id=\"" + (House)player.House + "\"/><" + (House)player.House + ">" + player.Username + ": </>" + msg);
                 }
