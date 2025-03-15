@@ -13,12 +13,12 @@ public abstract class Level
         UpdateEvent?.Invoke(Delta);
     }
 
-    protected abstract Actor? SpawnActorByClass(Type type);
+    protected abstract ScriptActor? SpawnActorByClass(Type type);
 
-    public T? Spawn<T>() where T : Actor
+    public T? Spawn<T>() where T : ScriptActor
     {
         return (T?)SpawnActorByClass(typeof(T));
     }
 
-    public abstract void Destroy(Actor actor);
+    public abstract void Destroy(ScriptActor actor);
 }

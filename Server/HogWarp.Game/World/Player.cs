@@ -24,38 +24,7 @@ public interface Player
         get;
     }
 
-    // Where do we put shared types? In this module?
-    public global::System.Numerics.Vector3 Position
-    {
-        get;
-    }
-
-    public float Direction
-    {
-        get;
-    }
-
-    public float Speed
-    {
-        get;
-    }
-
-    public bool IsInAir
-    {
-        get;
-    }
-
-    public byte House
-    {
-        get;
-    }
-
-    public byte Gender
-    {
-        get;
-    }
-
-    public bool IsMounted
+    public Actor? Puppet
     {
         get;
     }

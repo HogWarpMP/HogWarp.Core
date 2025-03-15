@@ -1,14 +1,12 @@
-﻿namespace HogWarp.Game.World;
+﻿using HogWarp.Game.World.Components;
 
-public class Actor
+namespace HogWarp.Game.World;
+
+public interface Actor
 {
-    protected uint _id;
-    protected ulong _klass;
+    public ulong Id { get; }
 
-    public uint Id { get { return _id; } set { _id = value; } }
-    public ulong Klass { get { return _klass; } set { _klass = value; } }
+    public bool HasComponent<T>() where T : IComponent;
 
-    public Actor()
-    {
-    }
+    public T? GetComponent<T>() where T : IComponent;
 }
