@@ -6,10 +6,12 @@ public abstract class PlayerManager : IEnumerable<Player>
 {    
     public abstract Player? GetById(ulong id);
 
-    public delegate void PlayerEvent(Player Id);
+    public delegate void PlayerDelegate(Player Id);
+    public delegate bool AuthenticationDelegate(string token, string username, ref bool block);
 
-    public event PlayerEvent? PlayerJoinEvent;
-    public event PlayerEvent? PlayerLeftEvent;
+    public event PlayerDelegate? PlayerJoinEvent;
+    public event PlayerDelegate? PlayerLeftEvent;
+    public event AuthenticationDelegate? AuthenticationEvent;
 
     protected void OnPlayerJoin(Player player)
     {
@@ -19,6 +21,11 @@ public abstract class PlayerManager : IEnumerable<Player>
     protected void OnPlayerLeft(Player player)
     {
         PlayerLeftEvent?.Invoke(player);
+    }
+
+    protected void OnAuthentication(string token, string username, ref bool block)
+    {
+        AuthenticationEvent?.Invoke(token, username, ref block);
     }
 
     public abstract IEnumerator<Player> GetEnumerator();
